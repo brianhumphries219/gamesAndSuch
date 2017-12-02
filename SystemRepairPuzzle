@@ -1,0 +1,226 @@
+#include <stdio.h>
+
+
+
+
+int main(){
+	
+	//cuz im lazy, change scenario type from 1-5 then compile for the different scenarios.
+	char scenarioType = 1;
+	
+	//loop variables
+	int attempts =0;
+
+
+	//variable[0] is displayed status. variable[1] is 'i has a problm'
+	char bussConnector[2] = {'0', 0};
+	char arcJunction[2] = {'0', 0};
+	char resistor[2] = {'0', 0};
+	char funcDelta[2] = {'0', 0};
+	char stackArray[2] = {'0', 0};
+	
+	char bussFault[] = "Buss Connector Fault Detected\0";
+	char arcFault[] = "Arc Junction Fault Detected\0";
+	char resistFault[] = "Fault detected in Resistor 2341A\0";
+	char funcFault[] = "Exception error in Function Delta 74F\0";
+	char stackFault[] = "Stack Array Overflow, system failure\0";
+	
+	char bussGood[] = "Buss Connector:\t\tTesting properly\0";
+	char arcGood[] = "Arc Junction:\t\tTesting properly\0";
+	char resistGood[] = "Resistor 2341A:\t\tTesting properly\0";
+	char funcGood[] = "Function D74:\t\tValid Result\0";
+	char stackGood[] = "Stack Array:\t\tCompiled Properly\0";
+	
+	
+	//only scenario 1 is ready. Use this section to set the game parameters and initial values.
+	switch(scenarioType) {
+		case 1: //provides information output from all other components
+			bussConnector[1] 	=1;
+			resistor[1]			=1;
+			bussConnector[0] 	='1';
+			arcJunction[0]		='1';
+			resistor[0]			='1';
+			funcDelta[0]		='1';
+			stackArray[0]		='1';
+			break;
+		case 2: //bypasses resistor when malfunctioning
+			arcJunction[1] 		=1;
+			bussConnector[0] 	='1';
+			arcJunction[0]		='2';
+			resistor[0]			='0';
+			funcDelta[0]		='3';
+			stackArray[0]		='4';
+			break;
+		case 3: //bypasses error detection when bypassed or damaged
+			resistor[1] 		=1;
+			bussConnector[0] 	='0';
+			arcJunction[0]		='0';
+			resistor[0]			='0';
+			funcDelta[0]		='0';
+			stackArray[0]		='0';
+			break;
+		case 4: //anything not displayed in hexadecimal is the fault
+			funcDelta[1] 		=1;
+			bussConnector[0] 	='1';
+			arcJunction[0]		='f';
+			resistor[0]			='e';
+			funcDelta[0]		='g';
+			stackArray[0]		='b';
+			break;
+		case 5:
+			stackArray[1] 		=1;
+			bussConnector[0] 	='1';
+			arcJunction[0]		='1';
+			resistor[0]			='1';
+			funcDelta[0]		='1';
+			stackArray[0]		='1';
+			break;
+		default:
+			break;
+		}
+	
+
+	
+	
+	printf("Welcome to AMII: Hardware Interface\n\n");
+	if (bussConnector[1] || arcJunction[1] || resistor[1] || funcDelta[1] || stackArray[1] == 1){
+		printf("\n*ALERT* Malfunction detected. Requires manual troubleshooting. Entering Diagnostic Mode.\n");
+		
+			// display and check alarm messages
+			if ((bussConnector[0] !=0) ? printf("%s\n", bussFault) : printf("%s\n", bussGood));
+			if ((arcJunction[0] !=0) ? printf("%s\n", arcFault) : printf("%s\n", arcGood));
+			if ((resistor[0] !=0) ?	printf("%s\n", resistFault) : printf("%s\n", resistGood));
+			if ((funcDelta[0] !=0) ? printf("%s\n", funcFault) : printf("%s\n", funcGood));
+			if ((stackArray[0] !=0) ? printf("%s\n", stackFault): printf("%s\n", stackGood));
+			//end display and check alarm messages
+		}
+		
+	while ((bussConnector[1] || arcJunction[1] || resistor[1] || funcDelta[1] || stackArray[1] == 1) && attempts<3){
+		int selectComponent = 0;
+		int selectAction = 0;
+		
+		printf("\nPlease examine the status of the following parts.\nLegend: 0 = Working properly. Any other character indicates a fault in that system. This fault can be caused by another part. \n\n1: Buss Connector:\t%c \n2: Arc Junction:\t%c \n3: Resistor 2341A: \t%c \n4: Function D74: \t%c \n5: Stack Array: \t%c \n", bussConnector[0], arcJunction[0], resistor[0], funcDelta[0], stackArray[0]);
+		
+		//select component
+		printf("\nEnter the number adjacent to the component to interact.");
+		scanf("\n%d", &selectComponent);
+		if (selectComponent<1 || selectComponent>5){
+			printf("Invalid Entry, number between 1-5\n");
+			scanf("\n%d", &selectComponent);
+		}
+		
+		//select whether to repair or inspect it.
+		printf("Enter 1 to inspect, 2 to repair it: ");
+		scanf("\n%d", &selectAction);
+		if (selectAction <1||selectAction>2){
+			printf("Invalid Entry, 1 for inspect or 2 for repair: \n");
+			scanf("\n%d", &selectAction);
+		}
+		
+		switch(selectComponent){
+			case 1:
+				if (bussConnector[0]=='1'){
+					printf("\nTech Tip: Buss Connector Faults are usually caused by another component shorting out and damaging it, usually misreading all user input displays except Resistor 2341A. Find and replace the other component first if you suspect a faulty Buss Connector.\n");
+					printf("%s\n", bussFault);
+					if (selectAction==2 && resistor[1]==0){ 
+						bussConnector[1]=0; //repaired
+						bussConnector[0] 	='0'; //status display
+						printf("Buss connector Repaired. \n");
+						break;
+						}else if (selectAction==2){
+							printf("New Buss Connector damaged on install. Something else is damaging it.\n");
+							attempts++;					
+							break;
+							}
+				}else{
+					printf("%s\n", bussGood);
+				}
+			break;
+			
+			case 2:
+				if (arcJunction[0]=='1'){
+					printf("\nTech Tip: When the Arc Junction malfunctions, Resistor 2341A should read 1 if the Buss Connector is working properly.\n");
+					printf("%s\n", arcFault);
+					if (selectAction==2 && bussConnector==0){ //add conditional
+						arcJunction[1]=0; //repaired
+						arcJunction[0]		='0';
+						printf("Arc Junction Repaired.\n");
+						break;
+					}else if (selectAction==2){
+						printf("Failure to meet condition.\n");
+						attempts++;					
+						break;
+						}
+				}else{
+					printf("%s\n", arcGood);
+				}
+			break;
+			
+			case 3:
+				if (resistor[0]=='1'){
+					printf("\nTech Tip: If any faults on any other systems are detected, and Resistor 2341A is operational, it should read 0.\n");
+					printf("%s\n", resistFault);
+					if (selectAction==2){ //add conditional
+						resistor[1]=0; //repaired
+						resistor[0]			='0';
+						printf("Resistor 2341A Repaired.\n");
+						break;
+					}/*else if (selectAction==2){
+						//printf("Failure to meet condition.\n");
+						//attempts++;					
+						//break;
+						}*/
+				}else{
+					printf("%s\n", resistGood);
+				}
+			break;
+			
+			case 4:
+				if (funcDelta[0]=='1'){
+					printf("\nTech Tip: A telltale sign of an error in the Function Delta 74D is a non-hexadecimal character showing in status.\n");
+					printf("%s\n", funcFault);
+					if (selectAction==2 && bussConnector==0){ //add conditional
+						funcDelta[1]=0; //repaired
+						funcDelta[0]='0';
+						printf("Function Delta 74D Re-initialized.\n");
+						break;
+					}else if (selectAction==2){
+						printf("Failure to re-initialize.\n");
+						attempts++;					
+						break;
+						}
+				}else{
+					printf("%s\n", funcGood);
+				}
+			break;
+			
+			case 5:
+				if (stackArray[0]=='1'){
+					printf("\nTech Tip: Stack Array Overflow is usually a critical exception\n");
+					printf("%s\n", stackFault);
+					if (selectAction==2 && bussConnector==0){
+						stackArray[1]=0; //repaired
+						stackArray[0]='0';
+						printf("Stack Array Reset Successfully.\n");
+						break;
+					}else if (selectAction==2){
+						printf("Failed to Reset.\n");
+						attempts++;					
+						break;
+						}
+				}else{
+					printf("%s\n", stackGood);
+				}
+			break;
+			
+			
+			default:
+				printf("Invalid Entry");
+			break;
+	}
+
+	}
+	if ((bussConnector[1] || arcJunction[1] || resistor[1] || funcDelta[1] || stackArray[1] == 1) ? printf("Failure to re-initialize. Reboot system.\n"): printf ("System repaired successfully.\n"));
+
+return 0;	
+}
