@@ -5,9 +5,9 @@
 
 int main(){
 	
-	int scenarioType = 1;
+	int scenarioType = 2;
 	int attempts =0;
-	char escape = '0';
+	char escape = '0'; //getch/getchar wouldn't work. Used to keep C from autoclosing when finished, when running as an .exe
 	int diagnostic = 0;
 	int diagnosticDC = 10;
 	
@@ -67,11 +67,11 @@ int main(){
 			break;
 		case 2: //arc junction defective
 			arcJunction[1] 		=1;
-			bussConnector[0] 	='1';
-			arcJunction[0]		='2';
-			resistor[0]			='0';
-			funcDelta[0]		='3';
-			stackArray[0]		='4';
+			bussConnector[0] 	='0';
+			arcJunction[0]		='1';
+			resistor[0]			='1';
+			funcDelta[0]		='a';
+			stackArray[0]		='2';
 			break;
 		case 3: //resistor damaged
 			resistor[1] 		=1;
@@ -110,11 +110,11 @@ int main(){
 		printf("\nLegend: 0 = Working properly. Any other character indicates a fault in that system. This fault can be caused by another part.\nTech: Inspect any system as much as needed. After 3 repair attempts, the system will need to be reset.\n\n\n");
 		
 			// display and check alarm messages
-			if ((bussConnector[0] !=0) ? printf("%s\n", bussFault) : printf("%s\n", bussGood));
-			if ((arcJunction[0] !=0) ? printf("%s\n", arcFault) : printf("%s\n", arcGood));
-			if ((resistor[0] !=0) ?	printf("%s\n", resistFault) : printf("%s\n", resistGood));
-			if ((funcDelta[0] !=0) ? printf("%s\n", funcFault) : printf("%s\n", funcGood));
-			if ((stackArray[0] !=0) ? printf("%s\n", stackFault): printf("%s\n", stackGood));
+			if ((bussConnector[0] !='0') ? printf("%s\n", bussFault) : printf("%s\n", bussGood));
+			if ((arcJunction[0] !='0') ? printf("%s\n", arcFault) : printf("%s\n", arcGood));
+			if ((resistor[0] !='0') ?	printf("%s\n", resistFault) : printf("%s\n", resistGood));
+			if ((funcDelta[0] !='0') ? printf("%s\n", funcFault) : printf("%s\n", funcGood));
+			if ((stackArray[0] !='0') ? printf("%s\n", stackFault): printf("%s\n", stackGood));
 			//end display and check alarm messages
 		}
 		
@@ -142,10 +142,10 @@ int main(){
 		
 		switch(selectComponent){
 			case 1:
-				if (bussConnector[0]=='1'){
+				if (bussConnector[0]!='0' && arcJunction[0]=='1'){
 					printf("\n%s\n", bussInspect);
 					printf("%s\n", bussFault);
-					if (selectAction==2 && resistor[1]==0){ 
+					if (selectAction==2 && arcJunction[1]==0){ 
 						bussConnector[1]=0; //repaired
 						bussConnector[0]='0'; //status display
 						printf("%s\n", bussGood);
@@ -164,45 +164,45 @@ int main(){
 				if (arcJunction[0]=='1'){
 					printf("\n%s\n", arcInspect);
 					printf("%s\n", arcFault);
-					if (selectAction==2 && bussConnector==0){ //add conditional
+					if (selectAction==2){ //add conditional
 						arcJunction[1]=0; //repaired
 						arcJunction[0]='0';
 						printf("%s\n", arcGood);
 						break;
-					}else if (selectAction==2){
+					}/*else if (selectAction==2){
 						printf("%s\n", arcFail);
 						attempts++;					
 						break;
-						}
+						}*/
 				}else{
 					printf("%s\n", arcGood);
 				}
 			break;
 			
 			case 3:
-				if (resistor[0]=='1'){
+				if (resistor[0]!='0' && arcJunction[0]=='1'){
 					printf("\n%s\n", resistInspect);
 					printf("%s\n", resistFault);
-					if (selectAction==2){ //add conditional
+					if (selectAction==2 && arcJunction[1]==0){ //add conditional
 						resistor[1]=0; //repaired
 						resistor[0]='0';
 						printf("%s\n", resistGood);
 						break;
-					}/*else if (selectAction==2){
-						//printf("%s\n", resistFail);
-						//attempts++;					
-						//break;
-						}*/
+					}else if (selectAction==2){
+						printf("%s\n", resistFail);
+						attempts++;					
+						break;
+						}
 				}else{
 					printf("%s\n", resistGood);
 				}
 			break;
 			
 			case 4:
-				if (funcDelta[0]=='1'){
+				if (funcDelta[0]!='0' && arcJunction[0]=='1'){
 					printf("\n%s\n", funcInspect);
 					printf("%s\n", funcFault);
-					if (selectAction==2 && bussConnector==0){ //add conditional
+					if (selectAction==2 && arcJunction[1]==0){ //add conditional
 						funcDelta[1]=0; //repaired
 						funcDelta[0]='0';
 						printf("%s\n", funcGood);
@@ -218,7 +218,7 @@ int main(){
 			break;
 			
 			case 5:
-				if (stackArray[0]=='1'){
+				if (stackArray[0]!='0' && arcJunction[0]=='1'){
 					printf("\n%s\n", stackInspect);
 					printf("Electrical result: \n");
 					scanf("\n%d", &diagnostic);
@@ -227,7 +227,7 @@ int main(){
 						}else{
 							printf("Could not read voltage.\n%s\n", stackFault);
 						}
-					if (selectAction==2 && bussConnector==0){
+					if (selectAction==2 && arcJunction[1]==0){
 						stackArray[1]=0; //repaired
 						stackArray[0]='0';
 						printf("%s\n", stackGood);
